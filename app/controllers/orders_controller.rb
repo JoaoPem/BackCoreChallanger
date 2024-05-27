@@ -1,5 +1,4 @@
 class OrdersController < ApplicationController
-
   before_action :authenticate_user!, :set_order, only: [:show, :update, :destroy]
 
   def index
@@ -7,29 +6,17 @@ class OrdersController < ApplicationController
     render json: @orders
   end
 
-  # def index
-  #   @orders = Order.all
-  #   orders_with_products = @orders.map do |order|
-  #     {
-  #       id: order.id,
-  #       processor: order.processor&.name,
-  #       motherboard: order.motherboard&.name,
-  #       ram: order.ram&.name,
-  #       video_card: order.video_card&.name,
-  #       created_at: order.created_at,
-  #       updated_at: order.updated_at
-  #     }
-  #   end
-  #   render json: orders_with_products
-  # end
-
   def show
-    @order =  Order.find(params[:id])
+    @order = Order.find(params[:id])
     render json: @order
   end
 
   def create
     @order = Order.new(order_params)
+    
+    order_ram = OrderRam.new(order: @order, ram_ids: params[:order][:ram_ids])
+    @order.order_ram = order_ram
+
     if @order.save
       render json: @order, status: :created, location: @order
     else
@@ -59,6 +46,6 @@ class OrdersController < ApplicationController
   end
 
   def order_params
-    params.require(:order).permit(:processor_id, :motherboard_id, :ram_id, :video_card_id)
+    params.require(:order).permit(:processor_id, :motherboard_id, :video_card_id, ram_ids: [])
   end
 end

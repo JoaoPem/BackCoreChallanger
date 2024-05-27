@@ -27,7 +27,7 @@ ram_data = (1..6).map do |i|
 end
 
 video_card_data = [
-  { name: "Evga Geforce RTX 2060", specifications: "{ \"memoria\": 6 }", category: category_map["Placa de Vídeo"] },
+  { name: "Evga Geforce RTX 2060 6GB", specifications: "{ \"memoria\": 6 }", category: category_map["Placa de Vídeo"] },
   { name: "Asus ROG Strix Geforce RTX 3060 6GB", specifications: "{ \"memoria\": 6 }", category: category_map["Placa de Vídeo"] },
   { name: "Gigabyte Radeon RX 6600 XT EAGLE 8GB", specifications: "{ \"memoria\": 8 }", category: category_map["Placa de Vídeo"] }
 ]
