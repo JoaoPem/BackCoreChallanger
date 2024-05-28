@@ -5,14 +5,23 @@ class OrdersController < ApplicationController
 
   # Listar todas as order.
   def index
-    @orders = Order.all
-    render json: @orders
+    @orders = Order.includes(:processor, :motherboard, :video_card, :order_ram).all
+    render json: @orders.to_json(include: {
+      processor: { only: [:id, :name] },
+      motherboard: { only: [:id, :name] },
+      video_card: { only: [:id, :name] },
+      order_ram: { include: { rams: { only: [:id, :name] } } }
+    })
   end
 
   # Exibi uma ordem específica.
   def show
-    @order = Order.find(params[:id])
-    render json: @order
+    render json: @order.to_json(include: {
+      processor: { only: [:id, :name] },
+      motherboard: { only: [:id, :name] },
+      video_card: { only: [:id, :name] },
+      order_ram: { include: { rams: { only: [:id, :name] } } }
+    })
   end
 
   def create
