@@ -1,0 +1,27 @@
+pt-BR:
+  activerecord:
+    errors:
+      models:
+        order:
+          attributes:
+            user:
+              blank: "é obrigatório"
+              required: "deve existir"
+            order_ram:
+              blank: "deve incluir pelo menos um slot de RAM"
+              required: "não pode estar em branco"
+            video_card:
+              required: "é necessária, pois a placa-mãe não possui vídeo integrado"
+              not_required: "não é necessária, pois a placa-mãe possui vídeo integrado"
+            processor:
+              blank: "não pode estar em branco"
+            motherboard:
+              blank: "não pode estar em branco"
+          messages:
+            incompatible_processor: "não é compatível com a placa-mãe selecionada"
+            ram_exceeds_slots: "excede o número de slots de memória disponíveis"
+            ram_exceeds_supported: "selecionada excede o total suportado pela placa-mãe"
+  errors:
+    messages:
+      blank: "não pode estar em branco"
+      required: "é obrigatório"
