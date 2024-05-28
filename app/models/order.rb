@@ -1,5 +1,6 @@
 class Order < ApplicationRecord
-  belongs_to :user
+
+  belongs_to :user, optional: false
   belongs_to :processor, class_name: 'Product', optional: true
   belongs_to :motherboard, class_name: 'Product', optional: true
   belongs_to :order_ram, optional: true
@@ -7,14 +8,20 @@ class Order < ApplicationRecord
 
   validates :processor, presence: true
   validates :motherboard, presence: true
+  validates :order_ram, presence: true
+  validate :validate_ram_presence
 
   validate :validate_processor_compatibility
   validate :validate_ram_selection
   validate :validate_video_card_requirement
 
-  before_save :assign_order_ram_id
-
   private
+
+  def validate_ram_presence
+    if order_ram.nil? || order_ram.ram_ids.empty?
+      errors.add(:order_ram, "deve incluir pelo menos um slot de RAM")
+    end
+  end
 
   def validate_processor_compatibility
     return if processor.nil? || motherboard.nil?
@@ -54,9 +61,5 @@ class Order < ApplicationRecord
     if video_integrado && !video_card.nil?
       errors.add(:video_card, "não é necessária, pois a placa-mãe possui vídeo integrado")
     end
-  end
-
-  def assign_order_ram_id
-    self.ram_id = order_ram&.id
   end
 end

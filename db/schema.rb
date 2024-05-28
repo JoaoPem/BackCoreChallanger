@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_05_27_115106) do
+ActiveRecord::Schema.define(version: 2024_05_27_170840) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -40,7 +40,6 @@ ActiveRecord::Schema.define(version: 2024_05_27_115106) do
   create_table "orders", force: :cascade do |t|
     t.bigint "processor_id"
     t.bigint "motherboard_id"
-    t.bigint "ram_id"
     t.bigint "video_card_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -49,7 +48,6 @@ ActiveRecord::Schema.define(version: 2024_05_27_115106) do
     t.index ["motherboard_id"], name: "index_orders_on_motherboard_id"
     t.index ["order_ram_id"], name: "index_orders_on_order_ram_id"
     t.index ["processor_id"], name: "index_orders_on_processor_id"
-    t.index ["ram_id"], name: "index_orders_on_ram_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
     t.index ["video_card_id"], name: "index_orders_on_video_card_id"
   end
@@ -79,7 +77,6 @@ ActiveRecord::Schema.define(version: 2024_05_27_115106) do
   add_foreign_key "orders", "order_rams"
   add_foreign_key "orders", "products", column: "motherboard_id"
   add_foreign_key "orders", "products", column: "processor_id"
-  add_foreign_key "orders", "products", column: "ram_id"
   add_foreign_key "orders", "products", column: "video_card_id"
   add_foreign_key "orders", "users"
   add_foreign_key "products", "categories"
