@@ -1,11 +1,28 @@
 class OrdersController < ApplicationController
 
   # Autenticação do usuário e configura a ordem antes de algumas ações específicas.
-  before_action :authenticate_user!, :set_order, only: [:show, :update, :destroy]
+  #before_action :authenticate_user!, except: [:index]
+  before_action :set_order, only: [:show, :update, :destroy]
 
   # Listar todas as order.
   def index
     @orders = Order.includes(:processor, :motherboard, :video_card, :order_ram).all
+
+    # Ordenação
+    if params[:sort_by].present?
+      @orders = @orders.order(params[:sort_by])
+    end
+
+    # Filtragem por user_id
+    if params[:user_id].present?
+      @orders = @orders.where(user_id: params[:user_id])
+    end
+
+    # Filtragem por order_id
+    if params[:order_id].present?
+      @orders = @orders.where(id: params[:order_id])
+    end
+
     render json: @orders.to_json(include: {
       processor: { only: [:id, :name] },
       motherboard: { only: [:id, :name] },
@@ -67,7 +84,7 @@ class OrdersController < ApplicationController
     @order = Order.find(params[:id])
   end
 
-    # Define quais parâmetros são permitidos para criar e atualizar uma ordem
+  # Define quais parâmetros são permitidos para criar e atualizar uma ordem
   def order_params
     params.require(:order).permit(:processor_id, :motherboard_id, :video_card_id, ram_ids: [])
   end

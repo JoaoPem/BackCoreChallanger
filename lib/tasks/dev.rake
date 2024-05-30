@@ -15,13 +15,18 @@ namespace :dev do
     end
   end
 
-  desc "Adiciona o usuário padrão"
+  desc "Adiciona os usuários padrões"
   task add_default_user: :environment do
-    User.create!(
-      email: 'user@user.com',
-      password: DEFAULT_PASSWORD,
-      password_confirmation: DEFAULT_PASSWORD
-    )
+    users = [
+      { email: 'user1@user.com', password: DEFAULT_PASSWORD, password_confirmation: DEFAULT_PASSWORD },
+      { email: 'user2@user.com', password: DEFAULT_PASSWORD, password_confirmation: DEFAULT_PASSWORD },
+      { email: 'user3@user.com', password: DEFAULT_PASSWORD, password_confirmation: DEFAULT_PASSWORD }
+    ]
+
+    users.each do |user_attrs|
+      User.create!(user_attrs)
+    end
+    
   end
 
   private
