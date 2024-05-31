@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_05_27_170840) do
+ActiveRecord::Schema.define(version: 2024_05_31_160628) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -29,12 +29,19 @@ ActiveRecord::Schema.define(version: 2024_05_27_170840) do
     t.index ["jti"], name: "index_jwt_denylists_on_jti"
   end
 
-  create_table "order_rams", force: :cascade do |t|
+  create_table "order_order_rams", force: :cascade do |t|
     t.bigint "order_id", null: false
+    t.bigint "order_ram_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_order_order_rams_on_order_id"
+    t.index ["order_ram_id"], name: "index_order_order_rams_on_order_ram_id"
+  end
+
+  create_table "order_rams", force: :cascade do |t|
     t.text "ram_ids", default: [], array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["order_id"], name: "index_order_rams_on_order_id"
   end
 
   create_table "orders", force: :cascade do |t|
@@ -44,9 +51,7 @@ ActiveRecord::Schema.define(version: 2024_05_27_170840) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id"
-    t.bigint "order_ram_id"
     t.index ["motherboard_id"], name: "index_orders_on_motherboard_id"
-    t.index ["order_ram_id"], name: "index_orders_on_order_ram_id"
     t.index ["processor_id"], name: "index_orders_on_processor_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
     t.index ["video_card_id"], name: "index_orders_on_video_card_id"
@@ -73,8 +78,8 @@ ActiveRecord::Schema.define(version: 2024_05_27_170840) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
-  add_foreign_key "order_rams", "orders"
-  add_foreign_key "orders", "order_rams"
+  add_foreign_key "order_order_rams", "order_rams"
+  add_foreign_key "order_order_rams", "orders"
   add_foreign_key "orders", "products", column: "motherboard_id"
   add_foreign_key "orders", "products", column: "processor_id"
   add_foreign_key "orders", "products", column: "video_card_id"
