@@ -1,6 +1,6 @@
 class Order < ApplicationRecord
 
-  # Associações com outros modelos.
+  # Associações com outros modelos
   belongs_to :user
   belongs_to :processor, class_name: 'Product', optional: true
   belongs_to :motherboard, class_name: 'Product', optional: true
@@ -8,19 +8,19 @@ class Order < ApplicationRecord
 
   # Associações com OrderRam através da tabela intermediária OrderOrderRam (N para N)
   has_many :order_order_rams, dependent: :destroy
-  has_many :order_rams, through: :order_order_rams
+  has_many :order_rams, through: :order_order_rams, dependent: :destroy
 
-  # Validações para garantir que estes atributos estejam presentes antes de salvar uma order.
+  # Validações para garantir que estes atributos estejam presentes antes de salvar uma order
   validates :user, presence: { message: I18n.t('activerecord.errors.models.order.attributes.user.blank') }
   validates :processor, presence: { message: I18n.t('activerecord.errors.models.order.attributes.processor.blank') }
   validates :motherboard, presence: { message: I18n.t('activerecord.errors.models.order.attributes.motherboard.blank') }
 
-  # Validações customizadas.
+  # Validações customizadas
   validate :validate_processor_compatibility
   validate :validate_ram_selection
   validate :validate_video_card_requirement
 
-  # Método de classe para criar uma ordem com RAMs associadas
+  # Criar uma ordem com RAMs associadas.
   def self.create_with_rams(user:, processor:, motherboard:, ram_ids:, video_card: nil)
     # Cria uma nova ordem com os parâmetros
     order = Order.new(user: user, processor: processor, motherboard: motherboard, video_card: video_card)
@@ -31,7 +31,7 @@ class Order < ApplicationRecord
       return order
     end
 
-    # Adiciona uma validação temporária de RAM para verificar a validade antes de salvar
+    # Verificar a validade antes de salvar
     order_ram = OrderRam.new(ram_ids: ram_ids)
     order.order_rams << order_ram
 

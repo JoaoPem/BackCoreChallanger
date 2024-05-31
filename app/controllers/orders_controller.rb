@@ -1,91 +1,69 @@
 class OrdersController < ApplicationController
-  # Autenticação do usuário e configura a ordem antes de algumas ações específicas.
-  # before_action :authenticate_user!, except: [:index]
+
+  # Callbacks
+  before_action :authenticate_user!
   before_action :set_order, only: [:show, :update, :destroy]
+  before_action :authorize_user, only: [:show, :update, :destroy]
 
-  # Listar todas as orders.
+  # Listar todos os pedidos do usuário autenticado
   def index
-    @orders = Order.includes(:processor, :motherboard, :video_card, :order_rams).all
-
-    # Ordenação
-    if params[:sort_by].present?
-      @orders = @orders.order(params[:sort_by])
-    end
-
-    # Filtragem por user_id
-    if params[:user_id].present?
-      @orders = @orders.where(user_id: params[:user_id])
-    end
-
-    # Filtragem por order_id
-    if params[:order_id].present?
-      @orders = @orders.where(id: params[:order_id])
-    end
-
-    render json: @orders.to_json(include: {
-      processor: { only: [:id, :name] },
-      motherboard: { only: [:id, :name] },
-      video_card: { only: [:id, :name] },
-      order_rams: { include: { rams: { only: [:id, :name] } } }
-    })
+    # Obtém todos os pedidos do usuário atual
+    @orders = current_user.orders
+    # Renderiza os pedidos em formato JSON
+    render json: @orders
   end
 
-  # Exibir uma ordem específica.
+  # Exibir um pedido específico do usuário autenticado
   def show
-    render json: @order.to_json(include: {
-      processor: { only: [:id, :name] },
-      motherboard: { only: [:id, :name] },
-      video_card: { only: [:id, :name] },
-      order_rams: { include: { rams: { only: [:id, :name] } } }
-    })
+    # Renderiza o pedido específico em formato JSON
+    render json: @order
   end
 
-  # Criar uma nova ordem.
+  # Novo pedido para o usuário autenticado
   def create
-    @order = Order.new(order_params)
-
+    # Inicializa um novo pedido com parâmetros permitidos
+    @order = current_user.orders.build(order_params)
     if @order.save
-      ram_ids = params[:order][:ram_ids]
-      ram_ids.each do |ram_id|
-        order_ram = OrderRam.create(ram_ids: [ram_id])
-        OrderOrderRam.create(order: @order, order_ram: order_ram)
-      end
-      render json: @order, status: :created, location: @order
+      # Renderiza o pedido criado em formato JSON com status de criado
+      render json: @order, status: :created
     else
+      # Renderiza os erros com status de entidade não processável
       render json: @order.errors, status: :unprocessable_entity
     end
   end
 
-  # Atualizar uma ordem existente.
+  # Atualizar um pedido existente do usuário autenticado
   def update
     if @order.update(order_params)
-      @order.order_rams.destroy_all
-      ram_ids = params[:order][:ram_ids]
-      ram_ids.each do |ram_id|
-        order_ram = OrderRam.create(ram_ids: [ram_id])
-        OrderOrderRam.create(order: @order, order_ram: order_ram)
-      end
       render json: @order
     else
       render json: @order.errors, status: :unprocessable_entity
     end
   end
 
-  # Excluir uma ordem existente.
+  # Excluir um pedido existente do usuário autenticado
   def destroy
+    # Exclui o pedido
     @order.destroy
     head :no_content
   end
 
   private
 
-  # Encontrar e definir a instância da ordem
+  # Encontrar e definir a instância do pedido
   def set_order
+    # Define a instância @order com base no parâmetro :id
     @order = Order.find(params[:id])
   end
 
-  # Define quais parâmetros são permitidos para criar e atualizar uma ordem
-  def order_params
-    params.require(:order).permit(:processor_id, :motherboard_id, :video_card_id, ram_ids: [])
+  # Autorizar o usuário para garantir que ele só possa acessar, atualizar ou excluir seus próprios pedidos
+  def authorize_user
+    # Se o user_id do pedido não corresponder ao id do usuário atual, retorna status 403 (Forbidden)
+    head :forbidden unless @order.user_id == current_user.id
   end
+
+  # Define quais parâmetros são permitidos para criar e atualizar um pedido
+  def order_params
+    # Permite apenas os parâmetros especificados para evitar atribuição massiva de outros atributos
+    params.require(:order).permit(:processor_id, :motherboard_id, :video_card_id, ram_ids: [])
 end
